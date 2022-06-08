@@ -8,34 +8,28 @@ def vec_euclidean(x, y):
     return np.linalg.norm(x - y, ord=2, axis=1)
 
 class DkDN():
-    def __init__(self, k=3, dist=vec_euclidean, batch_size=1024, n_jobs=-1):
-        """K nearest neighbours for pressure settings that maximize the SQI value
-        Args:
-            k (int): Number of neighbours. Defaults to 11.
-            weights (list, optional): Weigths for input variables. Defaults to None.
-            dist_matrix (ndarray, optional): Pre defined matrix distance between training samples. Defaults to None.
-        """
+    def __init__(self, k=3, dist=vec_euclidean, batch_size=1024, tol=10e-4, n_jobs=-1):
+
         self.k = k
         self.dist = dist
         self.n_jobs = n_jobs
         self.batch_size = batch_size
+        self.tol=tol
         
         
-    def fit(self, X, y):
-        """Fit the model using data_train as training data and target(SQI) as target values for ref setting pressure.
-        Args:
-            data_train (ndarray): [description]
-            target (1d-array): [description]
-            ref (1d-array): [description]
-        """
+    def fit(self, X, y, exclude_center=True):
+
         self.X = X
         self.y = y
         self.labels_ = np.unique(y)
         self.bt = BallTree(X)
+        self.exclude_center=exclude_center
     
         exclude_idxs = [[i] for i in range(len(self.X))]
-        neighbours, radius, prob_classes = self._wkncn_probability(self.X, exclude_idxs=exclude_idxs)
+
+        support_neighbours, neighbours, radius, prob_classes = self._wkncn_probability(self.X, exclude_idxs=exclude_idxs)
         
+        self.support_neighbours = support_neighbours
         self.neighbours = neighbours
         self.radius = radius
         self.probability = prob_classes
@@ -48,15 +42,15 @@ class DkDN():
         return np.max(self.dist(qs, target))
     
     
-    def _get_neighbours(self, targets, exclude_idxs=None, dualtree=True):
+    def _get_support_neighbours(self, targets, exclude_idxs=None, dualtree=True):
         if exclude_idxs is None:
             exclude_idxs = [[]] * len(targets)
         
-        qs = [set(exclude_idxs[i]) for i in range(len(targets))]
+        qs = [set() for i in range(len(targets))]
         qs_sum = np.zeros(shape=(len(targets), self.X.shape[1]))
         iterations = min(self.k, len(self.X))
         
-        initially_excluded = max(len(x) for x in qs)
+        initially_excluded = max(len(x) for x in exclude_idxs)
         
         for i in range(iterations):
             Z = (targets * (i+1) - qs_sum)
@@ -65,17 +59,18 @@ class DkDN():
             for t_i in range(len(targets)):
                 candidates = target_candidates[t_i]
                 previousy_used = qs[t_i]
+                black_list = exclude_idxs[t_i]
                 for idx in candidates:
-                    if idx not in previousy_used:
+                    if idx not in previousy_used and idx not in black_list :
                         qs[t_i].add(idx)
                         qs_sum[t_i] += self.X[idx]
                         break
                 else:
                     raise ValueError("At least one element should have been picked..")
-                
+        
         idxs = np.array([list(x) for x in qs])
-        vals = self.X[idxs.ravel()]
-        return vals.reshape((*idxs.shape, -1))
+        return idxs
+
 
     def _wkncn_probability(self, targets, exclude_idxs=None):
         if exclude_idxs is None:
@@ -88,48 +83,64 @@ class DkDN():
               targets[start:end], exclude_idxs[start:end]
             ])
         res = Parallel(n_jobs=self.n_jobs, prefer="threads")(delayed(self._wkncn_probability_batch)(*x) for x in args)
-        neighbours_list = list()
+        support_neighbours_list = list()
         radius_list = list()
         prob_classes_list = list()
         
-        for neighbours, radius, prob_classes in res:
-            neighbours_list.append(neighbours)
+        for support_neighbours, neighbours, radius, prob_classes in res:
+            support_neighbours_list.append(support_neighbours)
             radius_list.append(radius)
             prob_classes_list.append(prob_classes)
             
-        return np.concatenate(neighbours_list), np.concatenate(radius_list), np.concatenate(prob_classes_list)
+        return np.concatenate(support_neighbours_list), neighbours, np.concatenate(radius_list), np.concatenate(prob_classes_list)
     
         
     def _wkncn_probability_batch(self, targets, exclude_idxs):
-        neighbours = self._get_neighbours(targets, exclude_idxs=exclude_idxs)
-        radius = self._calculate_radio(neighbours, targets)
+        if exclude_idxs is None:
+            exclude_idxs = [[]] * len(targets)
+            
+        support_neighbours = self._get_support_neighbours(targets, exclude_idxs=exclude_idxs)
         
+        x_support_neighbours = self.X[support_neighbours.ravel()]
+        x_support_neighbours = x_support_neighbours.reshape((*support_neighbours.shape, -1))
+        
+        radius = self._calculate_radio(x_support_neighbours, targets)
         prob_classes_list = []
-
-        for _, (target, r) in enumerate(zip(targets, radius)):
-            sel_idxs, dist_sel = self.bt.query_radius(target.reshape(1, -1), r, return_distance=True)
+        neighbours_list = []
+        
+        for _, (target, r, exclude) in enumerate(zip(targets, radius, exclude_idxs)):
+            sel_idxs, dist_sel = self.bt.query_radius(target.reshape(1, -1), r+self.tol, return_distance=True)
             sel_idxs = sel_idxs[0]
             dist_sel = dist_sel[0]
+            
+            if self.exclude_center:
+                keep_mask = np.array([idx not in exclude for idx in sel_idxs])
+                sel_idxs = sel_idxs[keep_mask]
+                dist_sel = dist_sel[keep_mask]
+                
             y_sel = self.y[sel_idxs]
+            
             y_st = (np.exp(-dist_sel) / np.exp(-dist_sel).sum())
             probabilities = [round(np.sum(y_st[y_sel == i]), 2) for i in self.labels_]
             prob_classes_list.append(probabilities)
-
-        return neighbours, radius, np.array(prob_classes_list)
+            neighbours_list.append(list(sel_idxs))
+            
+        return support_neighbours, neighbours_list, radius, np.array(prob_classes_list)
     
-    def predict(self, target, label):
+    
+    # def predict(self, target, label):
         
-        target_shape = target.shape
-        if len(target_shape) == 1:
-            target = target.reshape(1, -1)
+    #     target_shape = target.shape
+    #     if len(target_shape) == 1:
+    #         target = target.reshape(1, -1)
         
-        neighbours, radius, prob_classes = self._wkncn_probability(target)
-        complexity = 1 - prob_classes[:, label]
+    #     support_neighbours, neighbours,radius, prob_classes = self._wkncn_probability(target)
+    #     complexity = 1 - prob_classes[:, label]
         
-        if len(target_shape) == 1:
-            complexity = complexity[0]
-            radius = radius[0]
-            neighbours = neighbours[0]
+    #     if len(target_shape) == 1:
+    #         complexity = complexity[0]
+    #         radius = radius[0]
+    #         support_neighbours = support_neighbours[0]
         
-        return complexity, radius, neighbours
+    #     return support_neighbours, neighbours,radius, complexity
 
