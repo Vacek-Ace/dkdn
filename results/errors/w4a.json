@@ -1,0 +1,13 @@
+{
+   "w4a": {
+      "method": "SVC",
+      "params": {
+         "C": 1000,
+         "gamma": 0.001,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.6994985355025453,
+      "score sd": 0.057161591959234107
+   }
+}
