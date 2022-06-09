@@ -1,0 +1,13 @@
+{
+   "w3a": {
+      "method": "SVC",
+      "params": {
+         "C": 10,
+         "gamma": 0.001,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.7196307544420699,
+      "score sd": 0.023698764926352207
+   }
+}
