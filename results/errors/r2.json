@@ -1,0 +1,12 @@
+{
+   "r2": {
+      "method": "RandomForestClassifier",
+      "params": {
+         "max_features": null,
+         "n_estimators": 100,
+         "random_state": 1234
+      },
+      "score": 0.771477996812524,
+      "score sd": 0.08332805913898068
+   }
+}

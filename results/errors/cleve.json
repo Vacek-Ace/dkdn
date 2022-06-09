@@ -1,0 +1,11 @@
+{
+   "cleve": {
+      "method": "KNeighborsClassifier",
+      "params": {
+         "n_jobs": -1,
+         "n_neighbors": 3
+      },
+      "score": 0.8308335965125024,
+      "score sd": 0.030566178137496992
+   }
+}

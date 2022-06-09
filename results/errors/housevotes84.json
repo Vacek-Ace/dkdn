@@ -1,0 +1,13 @@
+{
+   "housevotes84": {
+      "method": "SVC",
+      "params": {
+         "C": 100,
+         "gamma": 0.001,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.9710045854869257,
+      "score sd": 0.02066578628273481
+   }
+}

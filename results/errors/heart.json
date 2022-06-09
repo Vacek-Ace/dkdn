@@ -1,0 +1,13 @@
+{
+   "heart": {
+      "method": "SVC",
+      "params": {
+         "C": 1,
+         "gamma": 0.01,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.8428694032283938,
+      "score sd": 0.032494301835760485
+   }
+}

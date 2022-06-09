@@ -1,0 +1,13 @@
+{
+   "mammographic": {
+      "method": "SVC",
+      "params": {
+         "C": 10,
+         "gamma": 0.1,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.8131194676154923,
+      "score sd": 0.024181238619242724
+   }
+}

@@ -1,0 +1,11 @@
+{
+   "haberman": {
+      "method": "KNeighborsClassifier",
+      "params": {
+         "n_jobs": -1,
+         "n_neighbors": 11
+      },
+      "score": 0.6542141067856267,
+      "score sd": 0.03670274360395093
+   }
+}

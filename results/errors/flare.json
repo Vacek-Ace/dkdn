@@ -1,0 +1,14 @@
+{
+   "flare": {
+      "method": "GradientBoostingClassifier",
+      "params": {
+         "learning_rate": 0.3,
+         "max_depth": 3,
+         "max_features": "sqrt",
+         "n_estimators": 300,
+         "random_state": 1234
+      },
+      "score": 0.6323079470056655,
+      "score sd": 0.024687565356963447
+   }
+}

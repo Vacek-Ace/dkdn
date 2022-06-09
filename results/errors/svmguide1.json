@@ -1,0 +1,13 @@
+{
+   "svmguide1": {
+      "method": "SVC",
+      "params": {
+         "C": 1,
+         "gamma": 1,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.9643160979779504,
+      "score sd": 0.017965577126174238
+   }
+}

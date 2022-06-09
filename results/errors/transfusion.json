@@ -1,0 +1,13 @@
+{
+   "transfusion": {
+      "method": "SVC",
+      "params": {
+         "C": 1,
+         "gamma": 1,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.6340961852836895,
+      "score sd": 0.0765489624980679
+   }
+}

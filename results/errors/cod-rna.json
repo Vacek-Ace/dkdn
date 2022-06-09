@@ -1,0 +1,13 @@
+{
+   "cod-rna": {
+      "method": "SVC",
+      "params": {
+         "C": 1000,
+         "gamma": 0.001,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.9380135044236549,
+      "score sd": 0.025526976096181785
+   }
+}

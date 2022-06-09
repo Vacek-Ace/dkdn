@@ -1,0 +1,14 @@
+{
+   "ilpd": {
+      "method": "GradientBoostingClassifier",
+      "params": {
+         "learning_rate": 0.1,
+         "max_depth": 7,
+         "max_features": "sqrt",
+         "n_estimators": 300,
+         "random_state": 1234
+      },
+      "score": 0.6309043062078774,
+      "score sd": 0.037591912268059795
+   }
+}

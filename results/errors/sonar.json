@@ -1,0 +1,14 @@
+{
+   "sonar": {
+      "method": "GradientBoostingClassifier",
+      "params": {
+         "learning_rate": 0.1,
+         "max_depth": 3,
+         "max_features": "log2",
+         "n_estimators": 300,
+         "random_state": 1234
+      },
+      "score": 0.736700498667082,
+      "score sd": 0.07772454617489567
+   }
+}

@@ -1,0 +1,13 @@
+{
+   "bupa": {
+      "method": "SVC",
+      "params": {
+         "C": 1000,
+         "gamma": 0.01,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.6454255577861099,
+      "score sd": 0.04588412922953934
+   }
+}

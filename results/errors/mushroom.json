@@ -1,0 +1,13 @@
+{
+   "mushroom": {
+      "method": "SVC",
+      "params": {
+         "C": 1,
+         "gamma": 0.1,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 1.0,
+      "score sd": 0.0
+   }
+}

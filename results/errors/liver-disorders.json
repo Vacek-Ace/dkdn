@@ -1,0 +1,12 @@
+{
+   "liver-disorders": {
+      "method": "RandomForestClassifier",
+      "params": {
+         "max_features": "sqrt",
+         "n_estimators": 100,
+         "random_state": 1234
+      },
+      "score": 0.7640820850116288,
+      "score sd": 0.07099211792973706
+   }
+}

@@ -1,0 +1,13 @@
+{
+   "appendicitis": {
+      "method": "SVC",
+      "params": {
+         "C": 100,
+         "gamma": 0.001,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.8143772725209685,
+      "score sd": 0.09254649857076865
+   }
+}

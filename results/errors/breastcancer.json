@@ -1,0 +1,13 @@
+{
+   "breastcancer": {
+      "method": "SVC",
+      "params": {
+         "C": 10,
+         "gamma": 0.01,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.9777237275213612,
+      "score sd": 0.007365457287443159
+   }
+}

@@ -1,0 +1,14 @@
+{
+   "colon-cancer": {
+      "method": "GradientBoostingClassifier",
+      "params": {
+         "learning_rate": 0.3,
+         "max_depth": 5,
+         "max_features": "sqrt",
+         "n_estimators": 100,
+         "random_state": 1234
+      },
+      "score": 0.8946365486445325,
+      "score sd": 0.1038141197432146
+   }
+}
