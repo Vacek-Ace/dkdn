@@ -15,6 +15,10 @@ class NpEncoder(json.JSONEncoder):
             return super(NpEncoder, self).default(obj)
 
 
+def get_store_name(experiment, results_folder):
+    return os.path.join(results_folder, f'{experiment}.json')
+
+
 def confusion_matrix(preds, y, normalize=True):
     confusion_matrix = pd.crosstab(
         preds, y, margins=True, margins_name='total', normalize=normalize)
