@@ -21,35 +21,35 @@ def scaled_mcc(y_true, y_pred):
 
 
 for experiment in [
-## 'a9a',
-# 'appendicitis',
-# 'australian',
-# 'backache',
-# 'banknote',
-# 'breastcancer',
-# 'bupa',
-# 'cleve',
-# 'cod-rna',
-# 'colon-cancer',
-# 'diabetes',
-# 'flare',
-# 'fourclass',
-# 'german_numer',
-# 'haberman',
-# 'heart',
-# 'housevotes84',
-# 'ilpd',
-# 'ionosphere',
-# 'kr_vs_kp',
-# 'liver-disorders',
-# 'mammographic',
-# 'mushroom',
-# 'r2',
-# 'sonar',
-# 'splice',
-# 'svmguide1',
-# 'svmguide3',
-# 'transfusion',
+'a9a',
+'appendicitis',
+'australian',
+'backache',
+'banknote',
+'breastcancer',
+'bupa',
+'cleve',
+'cod-rna',
+'colon-cancer',
+'diabetes',
+'flare',
+'fourclass',
+'german_numer',
+'haberman',
+'heart',
+'housevotes84',
+'ilpd',
+'ionosphere',
+'kr_vs_kp',
+'liver-disorders',
+'mammographic',
+'mushroom',
+'r2',
+'sonar',
+'splice',
+'svmguide1',
+'svmguide3',
+'transfusion',
 'w1a',
 'w2a',
 'w3a',
@@ -57,7 +57,8 @@ for experiment in [
 'w5a',
 'w6a',
 'w7a',
-'w8a'
+'w8a',
+'a9a'
 ]:
     print(f'Experiment: {experiment}\n')
 
@@ -96,7 +97,7 @@ for experiment in [
     for method, grid_params in methods:
         print(f'Testing: {str(method())[:-2]} \n')
 
-        clf = GridSearchCV(method(), grid_params, scoring=score, n_jobs=-1, cv=5)
+        clf = GridSearchCV(method(), grid_params, scoring=score, n_jobs=-1, cv=5, verbose=2)
         clf.fit(X, y)
 
         if clf.best_score_ > best_score:
