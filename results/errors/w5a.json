@@ -1,0 +1,13 @@
+{
+   "w5a": {
+      "method": "SVC",
+      "params": {
+         "C": 1000,
+         "gamma": 0.001,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.6677118788893796,
+      "score sd": 0.05411447019849556
+   }
+}

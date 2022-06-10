@@ -1,0 +1,14 @@
+{
+   "a9a": {
+      "method": "GradientBoostingClassifier",
+      "params": {
+         "learning_rate": 0.2,
+         "max_depth": 3,
+         "max_features": "sqrt",
+         "n_estimators": 500,
+         "random_state": 1234
+      },
+      "score": 0.7858368190036995,
+      "score sd": 0.004402986978567461
+   }
+}

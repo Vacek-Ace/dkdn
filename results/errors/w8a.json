@@ -1,0 +1,13 @@
+{
+   "w8a": {
+      "method": "SVC",
+      "params": {
+         "C": 1,
+         "gamma": 0.001,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "score": 0.698388232369922,
+      "score sd": 0.06968622906166294
+   }
+}
