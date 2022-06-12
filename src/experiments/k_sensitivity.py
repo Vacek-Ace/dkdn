@@ -46,9 +46,9 @@ for experiment in [
 # 'w4a',
 # 'w5a',
 # 'w6a',
-'w7a',
+# 'w7a',
 'w8a',
-'a9a'
+# 'a9a'
 ]:
     print(f'Experiment: {experiment}\n')
 
@@ -68,7 +68,7 @@ for experiment in [
     
     exp_info = {experiment:{}}
     
-    for k in range(1, 12):
+    for k in range(9, 12):
         print(k)
         complexity_kdn, _ = kdn_score(X, y, k)
         global_complexity_kdn = np.mean(complexity_kdn)
