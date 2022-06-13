@@ -1,13 +1,23 @@
 {
    "appendicitis": {
-      "method": "SVC",
+      "method": "GradientBoostingClassifier",
       "params": {
-         "C": 100,
-         "gamma": 0.001,
-         "kernel": "rbf",
+         "learning_rate": 0.2,
+         "max_depth": 3,
+         "max_features": "sqrt",
+         "n_estimators": 300,
          "random_state": 1234
       },
-      "score": 0.8143772725209685,
-      "score sd": 0.09254649857076865
+      "score": 0.8396775833872681,
+      "score sd": 0.0941998269828488,
+      "test": {
+         "score": 0.8472222222222222,
+         "tp": 3,
+         "fp": 1,
+         "tn": 17,
+         "fn": 1,
+         "positives": 4,
+         "negatives": 18
+      }
    }
 }

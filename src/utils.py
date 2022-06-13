@@ -46,3 +46,12 @@ def df_description(df_path='../data', exp_path='../results/sampling'):
     dfs.sort_index(inplace=True)
     return dfs
 
+
+def confusion_matrix(preds, y, normalize=True):
+    confusion_matrix = pd.crosstab(
+        preds, y, margins=True, margins_name='total', normalize=normalize)
+    confusion_matrix.columns = pd.Index(
+        [0, 1, 'total'], dtype='object', name='real')
+    confusion_matrix.index = pd.Index(
+        [0, 1, 'total'], dtype='object', name='pred')
+    return confusion_matrix.round(2)

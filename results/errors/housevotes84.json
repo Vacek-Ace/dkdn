@@ -8,6 +8,15 @@
          "random_state": 1234
       },
       "score": 0.9710045854869257,
-      "score sd": 0.02066578628273481
+      "score sd": 0.02066578628273481,
+      "test": {
+         "score": 1.0,
+         "tp": 22,
+         "fp": 0,
+         "tn": 25,
+         "fn": 0,
+         "positives": 22,
+         "negatives": 25
+      }
    }
 }
