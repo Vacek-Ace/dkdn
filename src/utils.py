@@ -55,3 +55,4 @@ def confusion_matrix(preds, y, normalize=True):
     confusion_matrix.index = pd.Index(
         [0, 1, 'total'], dtype='object', name='pred')
     return confusion_matrix.round(2)
+    

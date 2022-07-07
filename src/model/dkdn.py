@@ -126,21 +126,3 @@ class DkDN():
             neighbours_list.append(list(sel_idxs))
             
         return support_neighbours, neighbours_list, radius, np.array(prob_classes_list)
-    
-    
-    # def predict(self, target, label):
-        
-    #     target_shape = target.shape
-    #     if len(target_shape) == 1:
-    #         target = target.reshape(1, -1)
-        
-    #     support_neighbours, neighbours,radius, prob_classes = self._wkncn_probability(target)
-    #     complexity = 1 - prob_classes[:, label]
-        
-    #     if len(target_shape) == 1:
-    #         complexity = complexity[0]
-    #         radius = radius[0]
-    #         support_neighbours = support_neighbours[0]
-        
-    #     return support_neighbours, neighbours,radius, complexity
-
