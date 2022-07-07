@@ -1,8 +1,6 @@
 import numpy as np
 from joblib import Parallel, delayed
-from sklearn.utils.fixes import _joblib_parallel_args
 from sklearn.neighbors import BallTree
-from sklearn.utils import check_array
 
 def vec_euclidean(x, y):
     return np.linalg.norm(x - y, ord=2, axis=1)
