@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import  make_scorer, matthews_corrcoef
+from sklearn.metrics import  make_scorer
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -16,9 +16,7 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
 from src.utils import *
 
-def scaled_mcc(y_true, y_pred):
-    matthews_corrcoef_scaled = (matthews_corrcoef(y_true, y_pred) + 1)/2
-    return matthews_corrcoef_scaled
+
 
 
 for experiment in [
@@ -149,3 +147,4 @@ for experiment in [
     
     with open(get_store_name(experiment, results_folder), 'w') as fout:
         json.dump(exp_info, fout, indent=3, cls=NpEncoder)
+        

@@ -1,7 +1,9 @@
-import pandas as pd
-import numpy as np
 import json
 import os
+import pandas as pd
+import numpy as np
+from sklearn.metrics import matthews_corrcoef
+
 
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -39,7 +41,7 @@ def df_description(df_path='../data', exp_path='../results/sampling'):
         try:
             X = pd.read_parquet(f'{df_path}/{exp}.parquet')
             dfs.loc[exp, 'instances'] = X.shape[0]
-            dfs.loc[exp, 'n_features'] = X.shape[1]
+            dfs.loc[exp, 'n_features'] = X.shape[1]-1
             dfs.loc[exp, 'class_prop'] = round(min(X['y'].value_counts()/X.shape[0]), 3)
         except :
             pass
@@ -56,3 +58,7 @@ def confusion_matrix(preds, y, normalize=True):
         [0, 1, 'total'], dtype='object', name='pred')
     return confusion_matrix.round(2)
     
+    
+def scaled_mcc(y_true, y_pred):
+    matthews_corrcoef_scaled = (matthews_corrcoef(y_true, y_pred) + 1)/2
+    return matthews_corrcoef_scaled
