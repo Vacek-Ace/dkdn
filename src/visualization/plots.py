@@ -1,3 +1,4 @@
+import scipy.stats as st
 import matplotlib.pyplot as plt
 import seaborn as sns
 from mlxtend.plotting import plot_decision_regions
@@ -30,9 +31,25 @@ def box_plot(df, sampling_method):
     plt.show()
     
     
-def box_plot_retraining(summary, feature, hline=0):
-    sns.set(rc={'figure.figsize':(15,10)})
+def box_plot(df, y):
+    sns.set(rc={'figure.figsize':(20,10)})
     sns.set_theme(style="ticks", palette="pastel")
-    sns.boxplot(data=summary, x="proportion", y=feature, hue="model")
-    plt.axhline(hline, ls='--', c='red')
+    sns.boxplot(data=df, x="k", y=y, hue="metric")
     plt.show()
+    
+def annotate(data, regressor='kdn'):
+    slope, intercept, r, p, std_err = st.linregress(data[regressor],data['score'])
+    ax = plt.gca()
+    plt.text(.05, .85, f'r={r:.2f}, p={p:.2g}',
+            transform=ax.transAxes)
+    plt.text(.05, .95, f'y={intercept:.2f} + {slope:.2f} ({std_err:.2f})x ',
+            transform=ax.transAxes)
+    plt.show()
+    
+    
+def plot_reg(df, k, metric, score):
+    df_corr = df[(df['k'] == k) & (df['metric'] == metric)]
+    g = sns.lmplot(x=score, y='score', data=df_corr)
+    annotate(df_corr, score)
+    
+    
