@@ -53,30 +53,29 @@ def df_description(df_path='../data', exp_path='../results/sampling'):
 def summary_relative_error(path='../results/instance_selection'):
     exp_by_df = 4 * 3
     exps = sorted([exp[:-5] for exp in os.listdir(path)])
-    summary = pd.DataFrame(columns = ['dataset', 'model', 'sampling method', 'performance gap', 'sample'], index = range(len(exps) * exp_by_df))
+    summary = pd.DataFrame(columns = ['dataset', 'model', 'sampling method', 'performance gap', 'sample', 'threshold'], index = range(len(exps) * exp_by_df))
     i = 0
     for exp in exps:
         
         with open(f'{path}/{exp}.json', 'r') as fin:
             exp_summary = json.load(fin)
-            
+        
         for sampling_method in [['test_score_kdn', 'props_kdn'], ['test_score_dynamic_kdn', 'props_dynamic_kdn'], ['test_score_dynamic_kdn_full', 'props_dynamic_kdn_full']]:
-            
             for model in ['SVC', 'KNeighborsClassifier', 'RandomForestClassifier', 'GradientBoostingClassifier']:
-                
                 test_score = exp_summary[model]['test_score']
-                try:
-                    best_index = np.argmax(exp_summary[model][sampling_method[0]])
-                    relative_error = test_score-exp_summary[model][sampling_method[0]][best_index]
-                    summary.loc[i, 'sample'] = exp_summary[model][sampling_method[1]][best_index]
-                    summary.loc[i, 'performance gap'] = relative_error
-                except: 
-                    summary.loc[i, 'sample'] = None
-                    summary.loc[i, 'performance gap'] = None
-                    
+
+                best_index = np.nanargmax(np.array(exp_summary[model][sampling_method[0]], dtype=np.float))
+                best_index_noNone = np.argmax(list(filter(None,exp_summary[model][sampling_method[0]])))
+                relative_error = test_score-exp_summary[model][sampling_method[0]][best_index]
+                summary.loc[i, 'sample'] = exp_summary[model][sampling_method[1]][best_index_noNone]
+                summary.loc[i, 'performance gap'] = relative_error
                 summary.loc[i, 'sampling method'] = sampling_method[0]
                 summary.loc[i, 'model'] = model
                 summary.loc[i, 'dataset'] = exp
+                if sampling_method[0] == 'test_score_kdn':
+                    summary.loc[i, 'threshold'] = [0.3, 0.5, 0.7, 0.9][best_index]
+                else: 
+                    summary.loc[i, 'threshold'] = [round(i*0.01, 2) for i in range(5, 100, 5)][best_index]
                 
                 i += 1
         
@@ -91,12 +90,16 @@ def scaled_mcc(y_true, y_pred):
 def statistical_summary(df, column):
     measures = ['test_score_kdn', 'test_score_dynamic_kdn', 'test_score_dynamic_kdn_full']
     
-    data = pd.DataFrame(columns = ['mean', 'std', 'min', '25%', '50%', '75%', 'max'], index = measures)
+    data = pd.DataFrame(columns = ['mean', 'std', 'min', '5%', '10%', '15%', '20%', '25%', '30%',
+       '35%', '40%', '45%', '50%', '55%', '60%', '65%', '70%', '75%', '80%',
+       '85%', '90%', '95%', 'max'], index = measures)
     
     for measure in measures:
-        data.loc[measure, :] = df[df['sampling method'] == measure][column].astype(float).describe()[['mean', 'std', 'min', '25%', '50%', '75%', 'max']]
+        data.loc[measure, :] = df[df['sampling method'] == measure][column].astype(float).describe(percentiles=[round(i*0.01, 2) for i in range(5, 100, 5)])[['mean', 'std', 'min', '5%', '10%', '15%', '20%', '25%', '30%',
+       '35%', '40%', '45%', '50%', '55%', '60%', '65%', '70%', '75%', '80%',
+       '85%', '90%', '95%', 'max']]
     
-    return data
+    return data.T
 
 
 def k_sensitivity_df():

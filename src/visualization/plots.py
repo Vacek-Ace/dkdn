@@ -1,3 +1,4 @@
+from locale import D_FMT
 import scipy.stats as st
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -51,5 +52,22 @@ def plot_reg(df, k, metric, score):
     df_corr = df[(df['k'] == k) & (df['metric'] == metric)]
     g = sns.lmplot(x=score, y='score', data=df_corr)
     annotate(df_corr, score)
+    
+    
+def distribution_plot(df, title='Performance gap'):
+    df_plot = df[3:22]
+    x = df_plot.index
+
+    plt.figure(figsize=(16, 6))
+
+    plt.plot(x, df_plot['test_score_kdn'], 'o--', color='red', alpha=0.5, label='kdn          {:.3f} ({:.3f})'.format(df.loc['mean', 'test_score_kdn'],df.loc['std', 'test_score_kdn']))
+    plt.plot(x, df_plot['test_score_dynamic_kdn'], 'o--', color='green', alpha=0.5, label='dkdn        {:.3f} ({:.3f})'.format(df.loc['mean', 'test_score_dynamic_kdn'],df.loc['std', 'test_score_dynamic_kdn']))
+    plt.plot(x, df_plot['test_score_dynamic_kdn_full'], 'o--', color='blue', alpha=0.5, label='dkdn-full  {:.3f} ({:.3f})'.format(df.loc['mean', 'test_score_dynamic_kdn_full'],df.loc['std', 'test_score_dynamic_kdn_full']))
+
+    plt.grid(axis='x', color='0.95')
+    plt.legend()
+    plt.title(title)
+
+    plt.show()
     
     
