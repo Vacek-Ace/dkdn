@@ -1,0 +1,69 @@
+{
+   "w1a": {
+      "info": {
+         "complexity": {
+            "global": [
+               0.03941443715295308
+            ],
+            "class 0": [
+               0.023848153926157058
+            ],
+            "class 1": [
+               0.5555172413793104
+            ]
+         },
+         "data": {
+            "n": 1981,
+            "n0": 1923,
+            "n1": 58
+         }
+      }
+   },
+   "SVC": {
+      "test_score": 0.8532271624700225,
+      "best_score": 0.8249640613577304,
+      "best_params": {
+         "C": 10,
+         "gamma": 0.0001,
+         "kernel": "rbf",
+         "random_state": 1234
+      },
+      "sample_proportion": 0.11,
+      "threshold": 0.8
+   },
+   "KNeighborsClassifier": {
+      "test_score": 0.920834533848498,
+      "best_score": 0.6638320862175615,
+      "best_params": {
+         "n_jobs": -1,
+         "n_neighbors": 9
+      },
+      "sample_proportion": 0.11,
+      "threshold": 0.6
+   },
+   "RandomForestClassifier": {
+      "test_score": 0.9051140927573016,
+      "best_score": 0.7635100408878079,
+      "best_params": {
+         "max_features": "log2",
+         "n_estimators": 300,
+         "n_jobs": -1,
+         "random_state": 1234
+      },
+      "sample_proportion": 0.12,
+      "threshold": 0.95
+   },
+   "GradientBoostingClassifier": {
+      "test_score": 0.8048328631534734,
+      "best_score": 0.7665142734732328,
+      "best_params": {
+         "learning_rate": 0.2,
+         "max_depth": 3,
+         "max_features": "log2",
+         "n_estimators": 100,
+         "random_state": 1234
+      },
+      "sample_proportion": 0.11,
+      "threshold": 0.85
+   }
+}
