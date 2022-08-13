@@ -57,7 +57,7 @@ def hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, metho
     smpl_idx = [cuts.index(i) for i in smpl_cuts]    
     
     # Corresponding index to each threshold-cut
-    samples_filtered = filter_sampling(complexity_grouped, cuts=smpl_cuts, p=1, random_state=1234)
+    samples_filtered = filter_sampling(complexity_grouped, cuts=smpl_cuts, p=2, random_state=1234)
     
     for i, complexity_index in list(zip(smpl_idx, samples_filtered)):
         
@@ -134,7 +134,53 @@ def hyperparameter_selection(X_train, y_train, smpl_cuts, cuts, method, grid_par
     return samples_scores, samples_params, samples_idx
 
 
-def search_idx(samples_scores, samples_params, cuts):
+def sample_selection(X_train, y_train, smpl_cuts, cuts, method, params, complexity_grouped, samples_scores, samples_params, samples_idx, rng_seed):
+    skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=rng_seed)
+
+    # Indexes of the picked threshold-cuts
+    smpl_idx = [cuts.index(i) for i in smpl_cuts]    
+    
+    # Corresponding index to each threshold-cut
+    samples_filtered = filter_sampling(complexity_grouped, cuts=smpl_cuts, p=1, random_state=1234)
+    
+    for i, complexity_index in list(zip(smpl_idx, samples_filtered)):
+        
+        clf = method(**params)
+        scores = []
+        
+        for train_index, test_index in skf.split(X_train, y_train):
+            
+            try:
+                sample_index = list(set(train_index).intersection(complexity_index))
+                clf.fit(X_train[sample_index], y_train[sample_index])
+                preds = clf.predict(X_train[test_index])
+                scoring = scaled_mcc(y_train[test_index], preds)
+            except:
+                scoring = -1
+            scores.extend([scoring])
+                
+            best_score = np.mean(scores)
+                
+        samples_scores[i] = best_score
+        samples_idx[i] = complexity_index
+        
+    return samples_scores, samples_idx
+
+def search_closets_idx(samples_scores):
+    
+    scores_array = np.array(samples_scores)
+    best_indexes = np.where((scores_array.max()-scores_array)<10e-3)[0]
+    index_of_interest = np.append(best_indexes-1, best_indexes+1)
+    index_of_interest = index_of_interest[(index_of_interest>0) & (index_of_interest<len(scores_array))]
+    new_index = []
+    
+    for i in index_of_interest:
+        if samples_scores[i] == 0:
+            new_index.extend([i])
+            
+    return new_index
+
+def search_idx(samples_scores, samples_params):
     
     best_index = np.argmax(samples_scores)
     righ_index = best_index+1
@@ -144,7 +190,7 @@ def search_idx(samples_scores, samples_params, cuts):
     if left_index >= 0:
         if samples_params[left_index] is None:
             new_index.extend([left_index])
-    if righ_index < len(cuts):
+    if righ_index < len(samples_scores):
         if samples_params[righ_index] is None:
             new_index.extend([righ_index])
             
