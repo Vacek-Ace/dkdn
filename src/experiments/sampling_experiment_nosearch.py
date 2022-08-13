@@ -1,3 +1,4 @@
+from heapq import heapify
 from sklearnex import patch_sklearn
 patch_sklearn()
 
@@ -62,7 +63,7 @@ for experiment in [
     
     print(f'Experiment: {experiment}\n')
 
-    results_folder = 'results/sampling_no_searching'
+    results_folder = 'results/sampling_no_searching_adjustment'
 
     os.makedirs(results_folder, exist_ok=True)
 
@@ -88,10 +89,23 @@ for experiment in [
     complexity_d_class_0 = np.mean(complexity_d[mask_class_0])
     complexity_d_class_1 = np.mean(complexity_d[mask_class_1])
     
-    # minority_class_idx, minority_class_proportion = minority_class_properties(y_train)
+    complexity_difference = np.abs(complexity_d_class_0-complexity_d_class_1)
 
-    # if minority_class_proportion > 0.10:
-    #     minority_class_idx = []
+    p = 1
+
+    if complexity_difference < 0.15:
+        
+        p = 5
+        highest_complexity_class_idx = []
+        
+    elif complexity_difference > 0.25:
+        
+        if complexity_d_class_0 > complexity_d_class_1:
+            highest_complexity_class_idx = np.where(mask_class_0)[0]
+        else:
+            highest_complexity_class_idx = np.where(mask_class_1)[0]
+        
+
     
     exp_info = {experiment: {'info': 
         {'complexity': {'global': [complexity_d_global],
@@ -135,17 +149,13 @@ for experiment in [
         # Initial best-scores
         samples_scores = np.full(len(cuts), 0.0)
         
-        # Initial best-params
-        samples_params = np.full(len(cuts), None)
-        
         # Initial best-samples
         samples_idx = np.full(len(cuts), None)
         
         for i in range(round((len(cuts) - len(rng_cuts))/2)):
             
             samples_scores, sample_idx = sample_selection(X_train, y_train, smpl_cuts, cuts, methods[method], params, 
-                                                                                    complexity_d, samples_scores, samples_params, 
-                                                                                    samples_idx, rng_seed)
+                                                          complexity_d, samples_scores, samples_idx, highest_complexity_class_idx, p, rng_seed)
             new_idx = search_closets_idx(samples_scores)
             smpl_cuts = np.array(cuts)[new_idx]
             
@@ -156,22 +166,24 @@ for experiment in [
         best_score = samples_scores[best_index]
         best_sample = sample_idx[best_index]
         
+        print(f'sample scores: {samples_scores} \n')
+        print(f'threshold: {cuts[best_index]} \n')        
+        print(f'sample_proportion: {round(len(best_sample)/len(X_train), 2)} \n')
+        
         clf = methods[method](**params)
         clf.fit(X_train[best_sample], y_train[best_sample])
         preds_test = clf.predict(X_test)
         test_score = scaled_mcc(y_test, preds_test)
         
         print(f'test score: {test_score} \n')
-        print(f'threshold: {cuts[best_index]} \n')
-        print(f'sample scores: {samples_scores} \n')
-        print(f'sample_proportion: {round(len(best_sample)/len(X_train), 2)} \n')
         
         method_info = {
             'test_score': test_score,
             'best_score': best_score,
             'sample_proportion': round(len(best_sample)/len(X_train), 2),
             'threshold': cuts[best_index],
-            'sample_params': samples_params,
+            'p': p,
+            'highest class adjustment': len(highest_complexity_class_idx)>0,
             'sample_scores': samples_scores
                 }
         

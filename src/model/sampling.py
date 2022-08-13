@@ -49,7 +49,7 @@ def filter_sampling(complexity, cuts=None, p=1, random_state=1234):
     return is_idx
 
 
-def hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, complexity_grouped, samples_scores, samples_params, samples_idx, rng_seed, minority_class_idx):
+def hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, complexity_grouped, samples_scores, samples_params, samples_idx, rng_seed, highest_complexity_class_idx):
 
     skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=rng_seed)
 
@@ -71,8 +71,8 @@ def hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, metho
             for train_index, test_index in skf.split(X_train, y_train):
             
                 sample_set = set(train_index).intersection(complexity_index)
-                minority_class_active = set(train_index).intersection(minority_class_idx)
-                sample_index = list(sample_set.union(set(minority_class_active)))
+                highest_class_active = set(train_index).intersection(highest_complexity_class_idx)
+                sample_index = list(sample_set.union(highest_class_active))
             
                 try:
                     clf.fit(X_train[sample_index], y_train[sample_index])
@@ -88,7 +88,7 @@ def hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, metho
                 
         samples_scores[i] = best_score
         samples_params[i] = best_params
-        samples_idx[i] = list(set(complexity_index).union(set(minority_class_idx)))
+        samples_idx[i] = list(set(complexity_index).union(set(highest_complexity_class_idx)))
         
     return samples_scores, samples_params, samples_idx
 
@@ -134,27 +134,38 @@ def hyperparameter_selection(X_train, y_train, smpl_cuts, cuts, method, grid_par
     return samples_scores, samples_params, samples_idx
 
 
-def sample_selection(X_train, y_train, smpl_cuts, cuts, method, params, complexity_grouped, samples_scores, samples_params, samples_idx, rng_seed):
+def sample_selection(X, y, smpl_cuts, cuts, method, params, complexity, samples_scores, 
+                     samples_idx, highest_complexity_class_idx, p, rng_seed):
+    
     skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=rng_seed)
 
     # Indexes of the picked threshold-cuts
-    smpl_idx = [cuts.index(i) for i in smpl_cuts]    
+    smpl_idx = [cuts.index(i) for i in smpl_cuts]
     
     # Corresponding index to each threshold-cut
-    samples_filtered = filter_sampling(complexity_grouped, cuts=smpl_cuts, p=1, random_state=1234)
+    samples_filtered = filter_sampling(complexity, cuts=smpl_cuts, p=p, random_state=1234)
     
     for i, complexity_index in list(zip(smpl_idx, samples_filtered)):
         
         clf = method(**params)
         scores = []
         
-        for train_index, test_index in skf.split(X_train, y_train):
+        for train_index, test_index in skf.split(X, y):
             
+            sample_set = set(train_index).intersection(complexity_index)
+            highest_complexity_class_active = set(train_index).intersection(set(highest_complexity_class_idx))
+            sample_index = list(sample_set.union(highest_complexity_class_active))
+        
             try:
-                sample_index = list(set(train_index).intersection(complexity_index))
-                clf.fit(X_train[sample_index], y_train[sample_index])
-                preds = clf.predict(X_train[test_index])
-                scoring = scaled_mcc(y_train[test_index], preds)
+                clf.fit(X[sample_index], y[sample_index])
+                preds = clf.predict(X[test_index])
+                scoring = scaled_mcc(y[test_index], preds)
+    
+            # try:
+            #     sample_index = list(set(train_index).intersection(complexity_index))
+            #     clf.fit(X_train[sample_index], y_train[sample_index])
+            #     preds = clf.predict(X_train[test_index])
+            #     scoring = scaled_mcc(y_train[test_index], preds)
             except:
                 scoring = -1
             scores.extend([scoring])
@@ -162,14 +173,14 @@ def sample_selection(X_train, y_train, smpl_cuts, cuts, method, params, complexi
             best_score = np.mean(scores)
                 
         samples_scores[i] = best_score
-        samples_idx[i] = complexity_index
+        samples_idx[i] =  list(set(complexity_index).union(set(highest_complexity_class_idx)))
         
     return samples_scores, samples_idx
 
 def search_closets_idx(samples_scores):
     
     scores_array = np.array(samples_scores)
-    best_indexes = np.where((scores_array.max()-scores_array)<10e-3)[0]
+    best_indexes = np.where((scores_array.max()-scores_array)<10e-4)[0]
     index_of_interest = np.append(best_indexes-1, best_indexes+1)
     index_of_interest = index_of_interest[(index_of_interest>0) & (index_of_interest<len(scores_array))]
     new_index = []

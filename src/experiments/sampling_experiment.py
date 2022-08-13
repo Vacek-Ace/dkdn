@@ -88,10 +88,21 @@ for experiment in [
     complexity_d_class_0 = np.mean(complexity_d[mask_class_0])
     complexity_d_class_1 = np.mean(complexity_d[mask_class_1])
     
-    # minority_class_idx, minority_class_proportion = minority_class_properties(y_train)
+    complexity_difference = np.abs(complexity_d_class_0-complexity_d_class_1)
 
-    # if minority_class_proportion > 0.10:
-    #     minority_class_idx = []
+    p = 1
+
+    if complexity_difference < 0.15:
+        
+        p = 3
+        highest_complexity_class_idx = []
+        
+    elif complexity_difference > 0.25:
+        
+        if complexity_d_class_0 > complexity_d_class_1:
+            highest_complexity_class_idx = np.where(mask_class_0)[0]
+        else:
+            highest_complexity_class_idx = np.where(mask_class_1)[0]
     
     exp_info = {experiment: {'info': 
         {'complexity': {'global': [complexity_d_global],
@@ -110,8 +121,6 @@ for experiment in [
     # complexity threshold-cuts
     cuts = [round(i*0.01, 2) for i in range(5, 100, 5)]
 
-    # grouping complexity according to the threshold-cuts
-    # complexity_grouped = complexity_grouping(complexity_d, cuts)
     complexity_grouped = complexity_d
     
     print(exp_info, '\n')
@@ -143,16 +152,13 @@ for experiment in [
         samples_idx = np.full(len(cuts), None)
         
         for i in range(round((len(cuts) - len(rng_cuts))/2)):
-            
-            # if len(minority_class_idx)>0:
-            #     samples_scores, samples_params, sample_idx = hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, 
-            #                                                                       complexity_grouped, samples_scores, samples_params, 
-            #                                                                       samples_idx, rng_seed, minority_class_idx)
-            # else:
-            samples_scores, samples_params, sample_idx = hyperparameter_selection(X_train, y_train, smpl_cuts, cuts, method, grid_params, 
-                                                                                    complexity_grouped, samples_scores, samples_params, 
-                                                                                    samples_idx, rng_seed)
-            new_idx = search_idx(samples_scores, samples_params, cuts)
+
+                
+            samples_scores, samples_params, sample_idx = hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, 
+                                                                                  complexity_d, samples_scores, samples_params, 
+                                                                                  samples_idx, rng_seed, highest_complexity_class_idx)
+
+            new_idx = search_closets_idx(samples_scores)
             smpl_cuts = np.array(cuts)[new_idx]
             
             if not len(smpl_cuts) > 0:
@@ -163,14 +169,16 @@ for experiment in [
         best_score = samples_scores[best_index]
         best_sample = sample_idx[best_index]
         
+        print(f'sample scores: {samples_scores} \n')
+        print(f'threshold: {cuts[best_index]} \n')        
+        print(f'sample_proportion: {round(len(best_sample)/len(X_train), 2)} \n')
+        
         clf = method(**best_params)
         clf.fit(X_train[best_sample], y_train[best_sample])
         preds_test = clf.predict(X_test)
         test_score = scaled_mcc(y_test, preds_test)
         
         print(f'test score: {test_score} \n')
-        print(f'threshold: {cuts[best_index]} \n')
-        print(f'sample_proportion: {round(len(best_sample)/len(X_train), 2)} \n')
         
         method_info = {
             'test_score': test_score,
@@ -178,6 +186,8 @@ for experiment in [
             'best_params': best_params,
             'sample_proportion': round(len(best_sample)/len(X_train), 2),
             'threshold': cuts[best_index],
+            'p': p,
+            'highest class adjustment': len(highest_complexity_class_idx)>0,
             'sample_params': samples_params,
             'sample scores': samples_scores
                 }
