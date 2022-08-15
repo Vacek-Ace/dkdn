@@ -49,7 +49,7 @@ def filter_sampling(complexity, cuts=None, p=1, random_state=1234):
     return is_idx
 
 
-def hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, complexity_grouped, samples_scores, samples_params, samples_idx, rng_seed, highest_complexity_class_idx):
+def hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, complexity_grouped, samples_scores, samples_params, samples_idx, rng_seed, highest_complexity_class_idx, p):
 
     skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=rng_seed)
 
@@ -57,7 +57,7 @@ def hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, metho
     smpl_idx = [cuts.index(i) for i in smpl_cuts]    
     
     # Corresponding index to each threshold-cut
-    samples_filtered = filter_sampling(complexity_grouped, cuts=smpl_cuts, p=2, random_state=1234)
+    samples_filtered = filter_sampling(complexity_grouped, cuts=smpl_cuts, p=p, random_state=1234)
     
     for i, complexity_index in list(zip(smpl_idx, samples_filtered)):
         
