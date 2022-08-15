@@ -63,7 +63,7 @@ for experiment in [
     
     print(f'Experiment: {experiment}\n')
 
-    results_folder = 'results/sampling_no_searching_adjustment'
+    results_folder = 'results/sampling_no_searching'
 
     os.makedirs(results_folder, exist_ok=True)
 

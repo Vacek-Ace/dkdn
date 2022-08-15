@@ -21,48 +21,48 @@ from src.model.dkdn import DkDN
 
 
 for experiment in [
-# 'a9a',
-# 'appendicitis',
-# 'australian',
-# 'backache',
-# 'banknote',
-# 'breastcancer',
-# 'bupa',
-# 'cleve',
-# 'cod-rna',
-# 'colon-cancer',
-# 'diabetes',
-# 'flare',
-# 'fourclass',
-# 'german_numer',
-# 'haberman',
-# 'heart',
-# 'housevotes84',
-# 'ilpd',
-# 'ionosphere',
-# 'kr_vs_kp',
-# 'liver-disorders',
-# 'mammographic',
-# 'mushroom',
-# 'r2',
-# 'sonar',
-# 'splice',
-# 'svmguide1',
-# 'svmguide3',
-# 'transfusion',
-# 'w1a',
-# 'w2a',
-# 'w3a',
-# 'w4a',
-# 'w5a',
-# 'w6a',
-# 'w7a',
+'a9a',
+'appendicitis',
+'australian',
+'backache',
+'banknote',
+'breastcancer',
+'bupa',
+'cleve',
+'cod-rna',
+'colon-cancer',
+'diabetes',
+'flare',
+'fourclass',
+'german_numer',
+'haberman',
+'heart',
+'housevotes84',
+'ilpd',
+'ionosphere',
+'kr_vs_kp',
+'liver-disorders',
+'mammographic',
+'mushroom',
+'r2',
+'sonar',
+'splice',
+'svmguide1',
+'svmguide3',
+'transfusion',
+'w1a',
+'w2a',
+'w3a',
+'w4a',
+'w5a',
+'w6a',
+'w7a',
 'w8a'
 ]:
     
     print(f'Experiment: {experiment}\n')
 
-    results_folder = 'results/sampling_no_grouping'
+    results_folder = 'results/sampling_searching'
 
     os.makedirs(results_folder, exist_ok=True)
 
@@ -156,7 +156,7 @@ for experiment in [
                 
             samples_scores, samples_params, sample_idx = hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, 
                                                                                   complexity_d, samples_scores, samples_params, 
-                                                                                  samples_idx, rng_seed, highest_complexity_class_idx)
+                                                                                  samples_idx, rng_seed, highest_complexity_class_idx, p)
 
             new_idx = search_closets_idx(samples_scores)
             smpl_cuts = np.array(cuts)[new_idx]
