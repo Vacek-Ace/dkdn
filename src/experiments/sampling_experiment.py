@@ -14,7 +14,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
-
+from src.model.instance_hardness import kdn_score
 from src.model.sampling import *
 from src.utils import NpEncoder
 from src.model.dkdn import DkDN
@@ -22,47 +22,49 @@ from src.model.dkdn import DkDN
 
 for experiment in [
 'a9a',
-'appendicitis',
-'australian',
-'backache',
-'banknote',
-'breastcancer',
-'bupa',
-'cleve',
-'cod-rna',
-'colon-cancer',
-'diabetes',
-'flare',
-'fourclass',
-'german_numer',
-'haberman',
-'heart',
-'housevotes84',
-'ilpd',
-'ionosphere',
-'kr_vs_kp',
-'liver-disorders',
-'mammographic',
-'mushroom',
-'r2',
-'sonar',
-'splice',
-'svmguide1',
-'svmguide3',
-'transfusion',
-'w1a',
-'w2a',
-'w3a',
-'w4a',
-'w5a',
-'w6a',
-'w7a',
-'w8a'
+# 'appendicitis',
+# 'australian',
+# 'backache',
+# 'banknote',
+# 'breastcancer',
+# 'bupa',
+# 'cleve',
+# 'cod-rna',
+# 'colon-cancer',
+# 'diabetes',
+# 'flare',
+# 'fourclass',
+# 'german_numer',
+# 'haberman',
+# 'heart',
+# 'housevotes84',
+# 'ilpd',
+# 'ionosphere',
+# 'kr_vs_kp',
+# 'liver-disorders',
+# 'mammographic',
+# 'mushroom',
+# 'r2',
+# 'sonar',
+# 'splice',
+# 'svmguide1',
+# 'svmguide3',
+# 'transfusion',
+# 'w1a',
+# 'w2a',
+# 'w3a',
+# 'w4a',
+# 'w5a',
+# 'w6a',
+# 'w7a',
+# 'w8a'
 ]:
     
     print(f'Experiment: {experiment}\n')
 
-    results_folder = 'results/sampling_searching'
+    metric = 'kdn'
+    
+    results_folder = f'results/sampling_searching_{metric}'
 
     os.makedirs(results_folder, exist_ok=True)
 
@@ -81,14 +83,28 @@ for experiment in [
     mask_class_0 = y_train == 0
     mask_class_1 = y_train == 1
 
-    dynamic_kdn = DkDN(k=3)
-    dynamic_kdn.fit(X_train, y_train)
-    complexity_d = dynamic_kdn.complexity
-    complexity_d_global = np.mean(complexity_d)
-    complexity_d_class_0 = np.mean(complexity_d[mask_class_0])
-    complexity_d_class_1 = np.mean(complexity_d[mask_class_1])
+
+    if metric == 'kdn':
+        complexity, _ = kdn_score(X_train, y_train, 5)
+        # complexity threshold-cuts
+        cuts = [0.20, 0.40, 0.60, 0.80]
+        rng_cuts = [[0.20], [0.40], [0.60], [0.80]]
+        
+    else:
+        dynamic_kdn = DkDN(k=3)
+        dynamic_kdn.fit(X_train, y_train)
+        complexity = dynamic_kdn.complexity
+        # complexity threshold-cuts
+        cuts = [round(i*0.01, 2) for i in range(5, 100, 5)]
+        # Grouped cuts based on the experimental distribution
+        rng_cuts = [[0.05, 0.10, 0.15, 0.20, 0.25], [0.30, 0.40, 0.45], [0.50, 0.60, 0.70, 0.75], [0.80, 0.85], [0.90, 0.95]]
     
-    complexity_difference = np.abs(complexity_d_class_0-complexity_d_class_1)
+        
+    complexity_global = np.mean(complexity)
+    complexity_class_0 = np.mean(complexity[mask_class_0])
+    complexity_class_1 = np.mean(complexity[mask_class_1])
+    
+    complexity_difference = np.abs(complexity_class_0-complexity_class_1)
 
     p = 1
 
@@ -99,15 +115,15 @@ for experiment in [
         
     elif complexity_difference > 0.25:
         
-        if complexity_d_class_0 > complexity_d_class_1:
+        if complexity_class_0 > complexity_class_1:
             highest_complexity_class_idx = np.where(mask_class_0)[0]
         else:
             highest_complexity_class_idx = np.where(mask_class_1)[0]
     
     exp_info = {experiment: {'info': 
-        {'complexity': {'global': [complexity_d_global],
-                        'class 0': [complexity_d_class_0],
-                        'class 1': [complexity_d_class_1]
+        {'complexity': {'global': [complexity_global],
+                        'class 0': [complexity_class_0],
+                        'class 1': [complexity_class_1]
         },
         'data': {'n': len(X_train),
                 'n0': len(y_train[mask_class_0]), 
@@ -118,11 +134,6 @@ for experiment in [
     rng_seed = 1234
     rng = np.random.default_rng(rng_seed)
 
-    # complexity threshold-cuts
-    cuts = [round(i*0.01, 2) for i in range(5, 100, 5)]
-
-    complexity_grouped = complexity_d
-    
     print(exp_info, '\n')
 
     methods = [[SVC, {'C': [1, 10, 100, 1000], 'gamma': [0.0001, 0.001, 0.01, 0.1, 1, 10], 'kernel':['rbf'], 
@@ -136,8 +147,6 @@ for experiment in [
 
     for method, grid_params in methods:
         print(f'{str(method())[:-2]} \n')
-        # Grouped cuts based on the experimental distribution
-        rng_cuts = [[0.05, 0.10, 0.15, 0.20, 0.25], [0.30, 0.40, 0.45], [0.50, 0.60, 0.70, 0.75], [0.80, 0.85], [0.90, 0.95]]
 
         # Initial threshold-cuts: Pick one element from each group of threshold-cuts
         smpl_cuts = [rng.choice(i) for i in rng_cuts]
@@ -151,11 +160,11 @@ for experiment in [
         # Initial best-samples
         samples_idx = np.full(len(cuts), None)
         
-        for i in range(round((len(cuts) - len(rng_cuts))/2)):
+        # for i in range(round((len(cuts) - len(rng_cuts))/2)):
+        for i in range(1):
 
-                
             samples_scores, samples_params, sample_idx = hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, 
-                                                                                  complexity_d, samples_scores, samples_params, 
+                                                                                  complexity, samples_scores, samples_params, 
                                                                                   samples_idx, rng_seed, highest_complexity_class_idx, p)
 
             new_idx = search_closets_idx(samples_scores)

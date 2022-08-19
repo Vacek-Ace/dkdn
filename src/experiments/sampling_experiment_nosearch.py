@@ -15,7 +15,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
-
+from src.model.instance_hardness import kdn_score
 from src.model.sampling import *
 from src.utils import NpEncoder
 from src.model.dkdn import DkDN
@@ -63,7 +63,9 @@ for experiment in [
     
     print(f'Experiment: {experiment}\n')
 
-    results_folder = 'results/sampling_no_searching'
+    metric = 'kdn'
+
+    results_folder = f'results/sampling_no_searching_{metric}'
 
     os.makedirs(results_folder, exist_ok=True)
 
@@ -82,14 +84,28 @@ for experiment in [
     mask_class_0 = y_train == 0
     mask_class_1 = y_train == 1
 
-    dynamic_kdn = DkDN(k=3)
-    dynamic_kdn.fit(X_train, y_train)
-    complexity_d = dynamic_kdn.complexity
-    complexity_d_global = np.mean(complexity_d)
-    complexity_d_class_0 = np.mean(complexity_d[mask_class_0])
-    complexity_d_class_1 = np.mean(complexity_d[mask_class_1])
+
     
-    complexity_difference = np.abs(complexity_d_class_0-complexity_d_class_1)
+    if metric == 'kdn':
+        complexity, _ = kdn_score(X_train, y_train, 5)
+        # complexity threshold-cuts
+        cuts = [0.20, 0.40, 0.60, 0.80]
+        rng_cuts = [[0.20], [0.40], [0.60], [0.80]]
+        
+    else:
+        dynamic_kdn = DkDN(k=3)
+        dynamic_kdn.fit(X_train, y_train)
+        complexity = dynamic_kdn.complexity
+        # complexity threshold-cuts
+        cuts = [round(i*0.01, 2) for i in range(5, 100, 5)]
+        # Grouped cuts based on the experimental distribution
+        rng_cuts = [[0.05, 0.10, 0.15, 0.20, 0.25], [0.30, 0.40, 0.45], [0.50, 0.60, 0.70, 0.75], [0.80, 0.85], [0.90, 0.95]]
+    
+    complexity_global = np.mean(complexity)
+    complexity_class_0 = np.mean(complexity[mask_class_0])
+    complexity_class_1 = np.mean(complexity[mask_class_1])
+
+    complexity_difference = np.abs(complexity_class_0-complexity_class_1)
 
     p = 1
 
@@ -100,7 +116,7 @@ for experiment in [
         
     elif complexity_difference > 0.25:
         
-        if complexity_d_class_0 > complexity_d_class_1:
+        if complexity_class_0 > complexity_class_1:
             highest_complexity_class_idx = np.where(mask_class_0)[0]
         else:
             highest_complexity_class_idx = np.where(mask_class_1)[0]
@@ -108,9 +124,9 @@ for experiment in [
 
     
     exp_info = {experiment: {'info': 
-        {'complexity': {'global': [complexity_d_global],
-                        'class 0': [complexity_d_class_0],
-                        'class 1': [complexity_d_class_1]
+        {'complexity': {'global': [complexity_global],
+                        'class 0': [complexity_class_0],
+                        'class 1': [complexity_class_1]
         },
         'data': {'n': len(X_train),
                 'n0': len(y_train[mask_class_0]), 
@@ -155,7 +171,7 @@ for experiment in [
         for i in range(round((len(cuts) - len(rng_cuts))/2)):
             
             samples_scores, sample_idx = sample_selection(X_train, y_train, smpl_cuts, cuts, methods[method], params, 
-                                                          complexity_d, samples_scores, samples_idx, highest_complexity_class_idx, p, rng_seed)
+                                                          complexity, samples_scores, samples_idx, highest_complexity_class_idx, p, rng_seed)
             new_idx = search_closets_idx(samples_scores)
             smpl_cuts = np.array(cuts)[new_idx]
             
