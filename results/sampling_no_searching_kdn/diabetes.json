@@ -1,0 +1,78 @@
+{
+   "diabetes": {
+      "info": {
+         "complexity": {
+            "global": [
+               0.3182410423452769
+            ],
+            "class 0": [
+               0.494392523364486
+            ],
+            "class 1": [
+               0.22400000000000003
+            ]
+         },
+         "data": {
+            "n": 614,
+            "n0": 214,
+            "n1": 400
+         }
+      }
+   },
+   "SVC": {
+      "test_score": 0.7299341025509218,
+      "best_score": 0.7467212219470815,
+      "sample_proportion": 0.75,
+      "threshold": 0.2,
+      "p": 1,
+      "highest class adjustment": true,
+      "sample_scores": [
+         0.7467212219470815,
+         0.744696596956393,
+         0.7371961583557344,
+         0.7294129736239309
+      ]
+   },
+   "KNeighborsClassifier": {
+      "test_score": 0.7370649327154437,
+      "best_score": 0.7336553789820522,
+      "sample_proportion": 0.75,
+      "threshold": 0.2,
+      "p": 1,
+      "highest class adjustment": true,
+      "sample_scores": [
+         0.7336553789820522,
+         0.7016867143354212,
+         0.6805930988774342,
+         0.6752170640793662
+      ]
+   },
+   "RandomForestClassifier": {
+      "test_score": 0.7361323453710109,
+      "best_score": 0.7622399476149768,
+      "sample_proportion": 0.75,
+      "threshold": 0.2,
+      "p": 1,
+      "highest class adjustment": true,
+      "sample_scores": [
+         0.7622399476149768,
+         0.7552077477848478,
+         0.7406692449227195,
+         0.7205165288210953
+      ]
+   },
+   "GradientBoostingClassifier": {
+      "test_score": 0.7506027013980308,
+      "best_score": 0.7522421817488292,
+      "sample_proportion": 0.9,
+      "threshold": 0.4,
+      "p": 1,
+      "highest class adjustment": true,
+      "sample_scores": [
+         0.7465990928155802,
+         0.7522421817488292,
+         0.7253320932906391,
+         0.7375713391375381
+      ]
+   }
+}

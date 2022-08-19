@@ -91,6 +91,7 @@ for experiment in [
         # complexity threshold-cuts
         cuts = [0.20, 0.40, 0.60, 0.80]
         rng_cuts = [[0.20], [0.40], [0.60], [0.80]]
+        n_try = 1
         
     else:
         dynamic_kdn = DkDN(k=3)
@@ -100,7 +101,8 @@ for experiment in [
         cuts = [round(i*0.01, 2) for i in range(5, 100, 5)]
         # Grouped cuts based on the experimental distribution
         rng_cuts = [[0.05, 0.10, 0.15, 0.20, 0.25], [0.30, 0.40, 0.45], [0.50, 0.60, 0.70, 0.75], [0.80, 0.85], [0.90, 0.95]]
-    
+        n_try = round((len(cuts) - len(rng_cuts))/2)
+        
     complexity_global = np.mean(complexity)
     complexity_class_0 = np.mean(complexity[mask_class_0])
     complexity_class_1 = np.mean(complexity[mask_class_1])
@@ -110,8 +112,7 @@ for experiment in [
     p = 1
 
     if complexity_difference < 0.15:
-        
-        p = 5
+        p = 3
         highest_complexity_class_idx = []
         
     elif complexity_difference > 0.25:
@@ -136,9 +137,6 @@ for experiment in [
     # random instance
     rng_seed = 1234
     rng = np.random.default_rng(rng_seed)
-
-    # complexity threshold-cuts
-    cuts = [round(i*0.01, 2) for i in range(5, 100, 5)]
     
     print(exp_info, '\n')
 
@@ -155,9 +153,6 @@ for experiment in [
         
         # best params 
         params = is_info[method]['best_params']
-        
-        # Grouped cuts based on the experimental distribution
-        rng_cuts = [[0.05, 0.10, 0.15, 0.20, 0.25], [0.30, 0.40, 0.45], [0.50, 0.60, 0.70, 0.75], [0.80, 0.85], [0.90, 0.95]]
 
         # Initial threshold-cuts: Pick one element from each group of threshold-cuts
         smpl_cuts = [rng.choice(i) for i in rng_cuts]
@@ -168,7 +163,7 @@ for experiment in [
         # Initial best-samples
         samples_idx = np.full(len(cuts), None)
         
-        for i in range(round((len(cuts) - len(rng_cuts))/2)):
+        for i in range(n_try):
             
             samples_scores, sample_idx = sample_selection(X_train, y_train, smpl_cuts, cuts, methods[method], params, 
                                                           complexity, samples_scores, samples_idx, highest_complexity_class_idx, p, rng_seed)

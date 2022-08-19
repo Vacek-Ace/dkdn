@@ -89,6 +89,7 @@ for experiment in [
         # complexity threshold-cuts
         cuts = [0.20, 0.40, 0.60, 0.80]
         rng_cuts = [[0.20], [0.40], [0.60], [0.80]]
+        n_try = 1
         
     else:
         dynamic_kdn = DkDN(k=3)
@@ -98,6 +99,7 @@ for experiment in [
         cuts = [round(i*0.01, 2) for i in range(5, 100, 5)]
         # Grouped cuts based on the experimental distribution
         rng_cuts = [[0.05, 0.10, 0.15, 0.20, 0.25], [0.30, 0.40, 0.45], [0.50, 0.60, 0.70, 0.75], [0.80, 0.85], [0.90, 0.95]]
+        n_try = round((len(cuts) - len(rng_cuts))/2)
     
         
     complexity_global = np.mean(complexity)
@@ -109,7 +111,6 @@ for experiment in [
     p = 1
 
     if complexity_difference < 0.15:
-        
         p = 3
         highest_complexity_class_idx = []
         
@@ -160,8 +161,8 @@ for experiment in [
         # Initial best-samples
         samples_idx = np.full(len(cuts), None)
         
-        # for i in range(round((len(cuts) - len(rng_cuts))/2)):
-        for i in range(1):
+        
+        for i in range(n_try):
 
             samples_scores, samples_params, sample_idx = hyperparameter_selection_adjustment(X_train, y_train, smpl_cuts, cuts, method, grid_params, 
                                                                                   complexity, samples_scores, samples_params, 

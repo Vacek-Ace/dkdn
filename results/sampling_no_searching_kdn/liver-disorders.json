@@ -1,0 +1,78 @@
+{
+   "liver-disorders": {
+      "info": {
+         "complexity": {
+            "global": [
+               0.37931034482758624
+            ],
+            "class 0": [
+               0.28611111111111115
+            ],
+            "class 1": [
+               0.5318181818181817
+            ]
+         },
+         "data": {
+            "n": 116,
+            "n0": 72,
+            "n1": 44
+         }
+      }
+   },
+   "SVC": {
+      "test_score": 0.6978684816410538,
+      "best_score": 0.7108080678827019,
+      "sample_proportion": 0.97,
+      "threshold": 0.8,
+      "p": 1,
+      "highest class adjustment": false,
+      "sample_scores": [
+         0.7044355695542114,
+         0.6781608768419419,
+         0.6615336438668837,
+         0.7108080678827019
+      ]
+   },
+   "KNeighborsClassifier": {
+      "test_score": 0.6562635275529451,
+      "best_score": 0.7197938962057302,
+      "sample_proportion": 0.65,
+      "threshold": 0.4,
+      "p": 1,
+      "highest class adjustment": false,
+      "sample_scores": [
+         0.7044355695542114,
+         0.7197938962057302,
+         0.6502360618825466,
+         0.6428241137237795
+      ]
+   },
+   "RandomForestClassifier": {
+      "test_score": 0.7777466203173866,
+      "best_score": 0.7201133921012278,
+      "sample_proportion": 0.97,
+      "threshold": 0.8,
+      "p": 1,
+      "highest class adjustment": false,
+      "sample_scores": [
+         0.6806364624544284,
+         0.702853082879538,
+         0.7160757936740664,
+         0.7201133921012278
+      ]
+   },
+   "GradientBoostingClassifier": {
+      "test_score": 0.815268520501556,
+      "best_score": 0.748336974011715,
+      "sample_proportion": 0.65,
+      "threshold": 0.4,
+      "p": 1,
+      "highest class adjustment": false,
+      "sample_scores": [
+         0.7006882989996667,
+         0.748336974011715,
+         0.7226281524654848,
+         0.7199330733691304
+      ]
+   }
+}

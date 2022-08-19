@@ -1,0 +1,78 @@
+{
+   "breastcancer": {
+      "info": {
+         "complexity": {
+            "global": [
+               0.054505494505494516
+            ],
+            "class 0": [
+               0.03298245614035088
+            ],
+            "class 1": [
+               0.09058823529411765
+            ]
+         },
+         "data": {
+            "n": 455,
+            "n0": 285,
+            "n1": 170
+         }
+      }
+   },
+   "SVC": {
+      "test_score": 0.9720774754816659,
+      "best_score": 0.965467341185617,
+      "sample_proportion": 0.53,
+      "threshold": 0.6,
+      "p": 3,
+      "highest class adjustment": false,
+      "sample_scores": [
+         0.9603950337552751,
+         0.9584608524169109,
+         0.965467341185617,
+         0.9586464941200062
+      ]
+   },
+   "KNeighborsClassifier": {
+      "test_score": 0.9160324114346872,
+      "best_score": 0.9627190246566748,
+      "sample_proportion": 0.37,
+      "threshold": 0.2,
+      "p": 3,
+      "highest class adjustment": false,
+      "sample_scores": [
+         0.9627190246566748,
+         0.9560278996222346,
+         0.9557668164732654,
+         0.9575801242424337
+      ]
+   },
+   "RandomForestClassifier": {
+      "test_score": 0.9622590592970439,
+      "best_score": 0.9478581956103072,
+      "sample_proportion": 0.58,
+      "threshold": 0.8,
+      "p": 3,
+      "highest class adjustment": false,
+      "sample_scores": [
+         0.9445561070371022,
+         0.9401948092127302,
+         0.9394574472096379,
+         0.9478581956103072
+      ]
+   },
+   "GradientBoostingClassifier": {
+      "test_score": 0.9527233095226311,
+      "best_score": 0.9521528277111065,
+      "sample_proportion": 0.58,
+      "threshold": 0.8,
+      "p": 3,
+      "highest class adjustment": false,
+      "sample_scores": [
+         0.951019725224509,
+         0.9496619640926234,
+         0.9487984581761726,
+         0.9521528277111065
+      ]
+   }
+}
