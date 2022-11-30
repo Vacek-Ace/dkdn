@@ -2,4 +2,6 @@ notebooks/.ipynb_checkpoints/*.ipynb
 *checkpoint.ipynb
 *.pyc
 
+src/__pychache__/*.pyc
+
 /src.egg-info
