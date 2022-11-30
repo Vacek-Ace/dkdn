@@ -1,1 +1,5 @@
+notebooks/.ipynb_checkpoints/*.ipynb
 *checkpoint.ipynb
+*.pyc
+
+/src.egg-info
