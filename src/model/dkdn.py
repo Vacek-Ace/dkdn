@@ -7,7 +7,15 @@ def vec_euclidean(x, y):
 
 class DkDN():
     def __init__(self, k=3, dist=vec_euclidean, batch_size=1024, tol=10e-4, n_jobs=-1):
+        """_summary_
 
+        Args:
+            k (int, optional): _description_. Defaults to 3.
+            dist (_type_, optional): _description_. Defaults to vec_euclidean.
+            batch_size (int, optional): _description_. Defaults to 1024.
+            tol (_type_, optional): _description_. Defaults to 10e-4.
+            n_jobs (int, optional): _description_. Defaults to -1.
+        """
         self.k = k
         self.dist = dist
         self.n_jobs = n_jobs
@@ -35,6 +43,15 @@ class DkDN():
             
         
     def _calculate_radio(self, qs, target):
+        """_summary_
+
+        Args:
+            qs (_type_): _description_
+            target (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if len(target.shape) == 2:
             return np.array([np.max(self.dist(qs[i], target[i])) for i in range(len(target))])
         return np.max(self.dist(qs, target))

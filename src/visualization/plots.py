@@ -23,19 +23,21 @@ def custom_decision_region_plot(X, y, model, title):
     plt.show()
     
     
-def box_plot(df, sampling_method):
-    df_plot = df[df.sampling_method == sampling_method]
-    sns.set(rc={'figure.figsize':(15,10)})
-    sns.set_theme(style="ticks", palette="pastel")
-    sns.boxplot(data=df_plot, x="sampling", y="performance gap", hue="model")
-    plt.axhline(0, ls='--', c='red')
-    plt.show()
+# def box_plot(df, sampling_method):
+#     df_plot = df[df.sampling_method == sampling_method]
+#     sns.set(rc={'figure.figsize':(15,10)})
+#     sns.set_theme(style="ticks", palette="pastel")
+#     sns.boxplot(data=df_plot, x="sampling", y="performance gap", hue="model")
+#     plt.axhline(0, ls='--', c='red')
+#     plt.show()
     
     
 def box_plot(df, y):
     sns.set(rc={'figure.figsize':(20,10)})
     sns.set_theme(style="ticks", palette="pastel")
     sns.boxplot(data=df, x="k", y=y, hue="metric")
+    # sns.violinplot(data=df, x="k", y=y, hue="metric",
+                # inner="quart", linewidth=1)
     plt.show()
     
 def annotate(data, regressor='kdn'):
@@ -52,6 +54,7 @@ def plot_reg(df, k, metric, score):
     df_corr = df[(df['k'] == k) & (df['metric'] == metric)]
     g = sns.lmplot(x=score, y='score', data=df_corr)
     annotate(df_corr, score)
+    return g
     
     
 def distribution_plot(df, title='Performance gap'):
